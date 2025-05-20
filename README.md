@@ -70,52 +70,6 @@ ORDER BY
     order_year, order_month;
 ```
 
-### 📈 Output Description
-
-**Schema (MySQL v8)**
-
-    -- Create orders table
-    CREATE TABLE orders (
-        order_id INT PRIMARY KEY AUTO_INCREMENT,
-        order_date DATE,
-        product_id INT,
-        amount DECIMAL(10, 2)
-    );
-    
-    -- Insert 500 rows using cross join of three derived tables with distinct aliases
-    INSERT INTO orders (order_date, product_id, amount)
-    SELECT
-        DATE_ADD('2023-01-01', INTERVAL FLOOR(RAND() * 365) DAY) AS order_date,
-        FLOOR(100 + RAND() * 20) AS product_id,   -- product ids between 100 and 120
-        ROUND(50 + RAND() * 950, 2) AS amount     -- amounts between 50 and 1000
-    FROM
-        (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
-         UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10) AS t1
-    CROSS JOIN
-        (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
-         UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10) AS t2
-    CROSS JOIN
-        (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5) AS t3
-    LIMIT 500;
-    
-    
-
----
-
-**Query #1**
-
-    SELECT
-        EXTRACT(YEAR FROM order_date) AS order_year,
-        EXTRACT(MONTH FROM order_date) AS order_month,
-        SUM(amount) AS total_revenue,
-        COUNT(DISTINCT order_id) AS total_orders
-    FROM
-        orders
-    GROUP BY
-        order_year, order_month
-    ORDER BY
-        order_year, order_month;
-
 ### Output         
 
 | order_year | order_month | total_revenue | total_orders |
