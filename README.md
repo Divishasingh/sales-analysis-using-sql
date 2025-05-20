@@ -72,12 +72,70 @@ ORDER BY
 
 ### 📈 Output Description
 
-| Column         | Description                           |
-| -------------- | ------------------------------------- |
-| order\_year    | Extracted year from `order_date`      |
-| order\_month   | Extracted month from `order_date`     |
-| total\_revenue | Total revenue for the given month     |
-| total\_orders  | Number of unique orders for the month |
+**Schema (MySQL v8)**
+
+    -- Create orders table
+    CREATE TABLE orders (
+        order_id INT PRIMARY KEY AUTO_INCREMENT,
+        order_date DATE,
+        product_id INT,
+        amount DECIMAL(10, 2)
+    );
+    
+    -- Insert 500 rows using cross join of three derived tables with distinct aliases
+    INSERT INTO orders (order_date, product_id, amount)
+    SELECT
+        DATE_ADD('2023-01-01', INTERVAL FLOOR(RAND() * 365) DAY) AS order_date,
+        FLOOR(100 + RAND() * 20) AS product_id,   -- product ids between 100 and 120
+        ROUND(50 + RAND() * 950, 2) AS amount     -- amounts between 50 and 1000
+    FROM
+        (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
+         UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10) AS t1
+    CROSS JOIN
+        (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
+         UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10) AS t2
+    CROSS JOIN
+        (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5) AS t3
+    LIMIT 500;
+    
+    
+
+---
+
+**Query #1**
+
+    SELECT
+        EXTRACT(YEAR FROM order_date) AS order_year,
+        EXTRACT(MONTH FROM order_date) AS order_month,
+        SUM(amount) AS total_revenue,
+        COUNT(DISTINCT order_id) AS total_orders
+    FROM
+        orders
+    GROUP BY
+        order_year, order_month
+    ORDER BY
+        order_year, order_month;
+
+### Output         
+
+| order_year | order_month | total_revenue | total_orders |
+| ---------- | ----------- | ------------- | ------------ |
+| 2023       | 1           | 29245.97      | 51           |
+| 2023       | 2           | 16018.95      | 34           |
+| 2023       | 3           | 18598.70      | 37           |
+| 2023       | 4           | 27930.39      | 50           |
+| 2023       | 5           | 19682.83      | 36           |
+| 2023       | 6           | 17847.51      | 32           |
+| 2023       | 7           | 23808.34      | 45           |
+| 2023       | 8           | 24028.83      | 44           |
+| 2023       | 9           | 17811.77      | 36           |
+| 2023       | 10          | 16149.21      | 28           |
+| 2023       | 11          | 26761.61      | 55           |
+| 2023       | 12          | 30649.73      | 52           |
+
+---
+
+[View on DB Fiddle](https://www.db-fiddle.com/f/j3DBaFqmsgYqfgiiDCL4SM/0)
 
 ### 📌 Key Learnings
 
