@@ -1,98 +1,57 @@
 
-# Sales Trend Analysis Using SQL Aggregations
+# 📊 Sales Trend Analysis Using SQL (500 Rows)
 
-## Objective
-Analyze monthly revenue and order volume from sales data using SQL aggregation functions and date extraction.
+## 🎯 Objective
+Analyze **monthly revenue** and **order volume** using SQL aggregation functions on a dataset of 500 randomly generated sales records.
 
-## Tools Used
-- DB Fiddle (https://www.db-fiddle.com/)
-- MySQL 8.0
+---
 
-  ## Files in this Project
+## 🛠️ Tools Used
+- [DB Fiddle (MySQL 8.0)](https://www.db-fiddle.com/)
+- MySQL SQL Queries
 
-* `setup_database.sql`: Contains the `CREATE TABLE` statement for the `orders` table and `INSERT` statements for sample data.
-* `sales_analysis.sql`: Contains the SQL query to perform the monthly sales trend analysis.
+---
 
+## 🗃️ Dataset Description
 
-## Dataset Description
-The dataset consists of an `orders` table with the following columns:
+**Table:** `orders`
 
-| Column      | Type           | Description                    |
-|-------------|----------------|-------------------------------|
-| order_id    | INT (Primary Key) | Unique identifier for each order |
-| order_date  | DATE           | Date when the order was placed |
-| product_id  | INT            | Identifier for the product ordered |
-| amount      | DECIMAL(10,2)  | Revenue amount for the order   |
+| Column      | Type           | Description                         |
+|-------------|----------------|-------------------------------------|
+| order_id    | INT (AUTO_INCREMENT) | Unique ID for each order         |
+| order_date  | DATE           | Date the order was placed           |
+| product_id  | INT            | Product identifier (100–120)        |
+| amount      | DECIMAL(10, 2) | Order revenue amount (₹50–₹1000)    |
 
-## Sample Data
-The sample dataset contains 50 rows with order data across multiple months in the year 2023, representing various products and revenue amounts.
+A total of **500 records** were inserted with randomized data values across the year **2023**.
 
-## How to Run the Analysis
+---
 
-Follow these steps to set up your database and run the sales trend analysis query:
+## 🧱 Schema & Data Generation Script
 
-### Step 1: Set up the Database and Populate Data
-
- -- Create table
+```sql
 CREATE TABLE orders (
-    order_id INT PRIMARY KEY,
+    order_id INT PRIMARY KEY AUTO_INCREMENT,
     order_date DATE,
     product_id INT,
     amount DECIMAL(10, 2)
 );
 
--- Insert 50 rows of sample data
-INSERT INTO orders (order_id, order_date, product_id, amount) VALUES
-(1, '2023-01-02', 101, 200.00),
-(2, '2023-01-05', 102, 150.00),
-(3, '2023-01-12', 103, 300.00),
-(4, '2023-01-22', 104, 400.00),
-(5, '2023-02-01', 101, 250.00),
-(6, '2023-02-10', 105, 150.00),
-(7, '2023-02-18', 106, 500.00),
-(8, '2023-02-25', 107, 300.00),
-(9, '2023-03-02', 108, 100.00),
-(10, '2023-03-06', 102, 200.00),
-(11, '2023-03-12', 103, 350.00),
-(12, '2023-03-20', 109, 400.00),
-(13, '2023-04-01', 101, 600.00),
-(14, '2023-04-07', 104, 700.00),
-(15, '2023-04-15', 110, 800.00),
-(16, '2023-04-22', 111, 300.00),
-(17, '2023-05-03', 101, 500.00),
-(18, '2023-05-08', 102, 600.00),
-(19, '2023-05-17', 104, 700.00),
-(20, '2023-05-27', 107, 800.00),
-(21, '2023-06-01', 108, 900.00),
-(22, '2023-06-04', 105, 150.00),
-(23, '2023-06-10', 103, 250.00),
-(24, '2023-06-15', 111, 300.00),
-(25, '2023-06-21', 109, 400.00),
-(26, '2023-07-02', 101, 550.00),
-(27, '2023-07-09', 104, 650.00),
-(28, '2023-07-12', 102, 750.00),
-(29, '2023-07-19', 107, 850.00),
-(30, '2023-07-25', 108, 950.00),
-(31, '2023-08-03', 109, 1050.00),
-(32, '2023-08-07', 110, 1150.00),
-(33, '2023-08-15', 101, 1250.00),
-(34, '2023-08-22', 102, 1350.00),
-(35, '2023-09-01', 103, 1450.00),
-(36, '2023-09-05', 104, 1550.00),
-(37, '2023-09-12', 105, 1650.00),
-(38, '2023-09-20', 106, 1750.00),
-(39, '2023-10-01', 107, 1850.00),
-(40, '2023-10-09', 108, 1950.00),
-(41, '2023-10-18', 109, 2050.00),
-(42, '2023-10-25', 110, 2150.00),
-(43, '2023-11-03', 111, 2250.00),
-(44, '2023-11-08', 101, 2350.00),
-(45, '2023-11-15', 102, 2450.00),
-(46, '2023-11-23', 103, 2550.00),
-(47, '2023-12-01', 104, 2650.00),
-(48, '2023-12-10', 105, 2750.00),
-(49, '2023-12-20', 106, 2850.00),
-(50, '2023-12-28', 107, 2950.00);
+-- Insert 500 random orders
+INSERT INTO orders (order_date, product_id, amount)
+SELECT
+    DATE_ADD('2023-01-01', INTERVAL FLOOR(RAND() * 365) DAY) AS order_date,
+    FLOOR(100 + RAND() * 20) AS product_id,
+    ROUND(50 + RAND() * 950, 2) AS amount
+FROM
+    (SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
+     UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10) AS t1
+CROSS JOIN
+    (SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
+     UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10) AS t2
+CROSS JOIN
+    (SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5) AS t3
+LIMIT 500;
 
 
 ##  Step 2: Run the Sales Trend Analysis Query
@@ -111,7 +70,20 @@ ORDER BY
     order_year, order_month;
 ```
 
-## Expected Output
+### 📈 Output Description
 
-After successfully running the `sales_analysis.sql` query on the provided `orders` table, you will receive a results table similar to the one below. This table displays the aggregated `total_revenue` and `total_orders` (volume) for each month in the dataset, ordered chronologically.
-  
+| Column         | Description                           |
+| -------------- | ------------------------------------- |
+| order\_year    | Extracted year from `order_date`      |
+| order\_month   | Extracted month from `order_date`     |
+| total\_revenue | Total revenue for the given month     |
+| total\_orders  | Number of unique orders for the month |
+
+### 📌 Key Learnings
+
+-How to use GROUP BY with YEAR() and MONTH() functions for time-based analysis.
+-Use of SUM() and COUNT(DISTINCT) for aggregations.
+-Creating test data using SQL-only approaches without manual entry.
+-Time-series breakdown of business KPIs like revenue and order volume.
+
+### LINK -https://www.db-fiddle.com/f/j3DBaFqmsgYqfgiiDCL4SM/0  
